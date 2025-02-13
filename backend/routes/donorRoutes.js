@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken")
 const Donor = require("../models/Donor.js");
 const sendEmail = require("../utils/sendEmail.js");
 const randomstring = require("randomstring");
+const authMiddleware = require("../middlewares/authMiddleware.js");
+
 
 const router = express.Router();
 
@@ -131,6 +133,23 @@ router.post("/login", async(req, res) => {
             message: "Error logging in"
         });
     }
+});
+
+
+router.get("/Dashboard", authMiddleware, async (req, res) => {
+    try {
+        const donor = await Donor.findById(req.user.id).select("-password");
+        if (!donor) {
+            return res.status(404).json({ message: "Donor not found" });
+        }
+        res.json(donor);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching donor profile" });
+    }
+});
+
+router.post("/logout", authMiddleware, async (req, res) => {
+    res.json({message: "Logged out successfully"});
 });
 
 module.exports = router;

@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const connectDB = require("./config/db.js");
 const donorRoutes = require("./routes/donorRoutes.js");
+const authMiddleware = require("./middlewares/authMiddleware.js")
 
 const app = express();
 connectDB();
