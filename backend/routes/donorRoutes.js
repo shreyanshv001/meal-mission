@@ -1,7 +1,7 @@
 const express = require("express")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
-const Donor = require("../models/Donor.js");
+const DonorModel = require("../models/donorModel.js");
 const sendEmail = require("../utils/sendEmail.js");
 const randomstring = require("randomstring");
 const authMiddleware = require("../middlewares/authMiddleware.js");
@@ -18,7 +18,7 @@ router.post("/register", async(req, res) =>{
     const {name, email, password, phone, address} = req.body;
 
     try{
-    const existingUser = await Donor.findOne({ email });
+    const existingUser = await DonorModel.findOne({ email });
     if (existingUser) return res.status(400).json({ message: "Email already exists" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -28,7 +28,7 @@ router.post("/register", async(req, res) =>{
     const otpExpires = new Date(Date.now() + 5 * 60 * 1000) // 5 min expiry
     
     //creating and saving new donor
-    const donor = new Donor({
+    const donor = new DonorModel({
         name,
         email,
         password: hashedPassword,
@@ -59,7 +59,7 @@ router.post("/verify-otp", async(req, res) => {
     const {email, otp} = req.body;
 
     try{
-        const donor = await Donor.findOne({ email });
+        const donor = await DonorModel.findOne({ email });
         
         if(!donor) 
             return res.json(400).json({
@@ -98,7 +98,7 @@ router.post("/login", async(req, res) => {
 
     //wapas se checking ki donor is verified or not
     try {
-        const donor = await Donor.findOne({ email });
+        const donor = await DonorModel.findOne({ email });
     
         if (!donor) 
             return res.status(400).json({ 
@@ -138,7 +138,7 @@ router.post("/login", async(req, res) => {
 
 router.get("/Dashboard", authMiddleware, async (req, res) => {
     try {
-        const donor = await Donor.findById(req.user.id).select("-password");
+        const donor = await DonorModel.findById(req.user.id).select("-password");
         if (!donor) {
             return res.status(404).json({ message: "Donor not found" });
         }

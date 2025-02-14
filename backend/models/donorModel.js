@@ -43,4 +43,5 @@ const donorSchema = new mongoose.Schema({
     },
 })
 
-module.exports = mongoose.model("Donor", donorSchema);
+const DonorModel = mongoose.model("Donor", donorSchema);
+module.exports = DonorModel;
